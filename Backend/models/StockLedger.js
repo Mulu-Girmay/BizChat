@@ -1,24 +1,5 @@
 const mongoose = require('mongoose');
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     StockLedger:
- *       type: object
- *       properties:
- *         _id:           { type: string }
- *         storeId:       { type: string }
- *         productId:     { type: string }
- *         changeType:    { type: string }
- *         previousStock: { type: number }
- *         changeAmount:  { type: number }
- *         newStock:      { type: number }
- *         reason:        { type: string }
- *         triggeredBy:   { type: string }
- *         createdAt:     { type: string, format: date-time }
- */
-
 const stockLedgerSchema = new mongoose.Schema(
   {
     storeId: {

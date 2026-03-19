@@ -1,22 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       properties:
- *         _id:         { type: string }
- *         name:        { type: string }
- *         email:       { type: string, format: email }
- *         role:        { type: string, enum: [owner, employee] }
- *         storeId:     { type: string }
- *         permissions: { type: object }
- *         isActive:    { type: boolean }
- *         createdAt:   { type: string, format: date-time }
- */
+
 
 const permissionsSchema = new mongoose.Schema(
   {

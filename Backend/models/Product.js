@@ -1,25 +1,6 @@
 const mongoose = require('mongoose');
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Product:
- *       type: object
- *       properties:
- *         _id:               { type: string }
- *         storeId:           { type: string }
- *         name:              { type: string }
- *         description:       { type: string }
- *         sku:               { type: string }
- *         category:          { type: string }
- *         price:             { type: number }
- *         stock:             { type: number }
- *         reservedStock:     { type: number }
- *         lowStockThreshold: { type: number }
- *         images:            { type: array, items: { type: string } }
- *         isActive:          { type: boolean }
- */
+
 
 const productSchema = new mongoose.Schema(
   {

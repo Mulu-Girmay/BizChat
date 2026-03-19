@@ -1,25 +1,7 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Order:
- *       type: object
- *       properties:
- *         _id:            { type: string }
- *         orderNumber:    { type: string }
- *         storeId:        { type: string }
- *         sessionId:      { type: string }
- *         customer:       { type: object }
- *         items:          { type: array }
- *         status:         { type: string, enum: [pending, confirmed, cancelled, fulfilled] }
- *         totalAmount:    { type: number }
- *         trackingToken:  { type: string }
- */
 
-// ─── Sub-schema: individual line item ────────────────────────────────────────
 const orderItemSchema = new mongoose.Schema(
   {
     product: {

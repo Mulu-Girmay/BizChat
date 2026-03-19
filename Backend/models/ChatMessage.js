@@ -1,23 +1,6 @@
 const mongoose = require('mongoose');
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     ChatMessage:
- *       type: object
- *       properties:
- *         _id:         { type: string }
- *         storeId:     { type: string }
- *         sessionId:   { type: string }
- *         senderRole:  { type: string, enum: [owner, employee, customer] }
- *         messageType: { type: string, enum: [text, product_card, order_confirmation, order_cancelled, system] }
- *         content:     { type: string }
- *         productCard: { type: object }
- *         isRead:      { type: boolean }
- */
 
-// ─── Embedded product card (sent inside chat bubble) ─────────────────────────
 const productCardSchema = new mongoose.Schema(
   {
     productId:     { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },

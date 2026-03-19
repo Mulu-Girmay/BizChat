@@ -1,21 +1,6 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Store:
- *       type: object
- *       properties:
- *         _id:       { type: string }
- *         name:      { type: string }
- *         slug:      { type: string }
- *         ownerId:   { type: string }
- *         chatLink:  { type: string }
- *         logoUrl:   { type: string }
- *         isActive:  { type: boolean }
- */
 
 const storeSchema = new mongoose.Schema(
   {
@@ -108,7 +93,6 @@ storeSchema.pre('save', function (next) {
   next();
 });
 
-// ─── Indexes ─────────────────────────────────────────────────────────────────
 storeSchema.index({ slug: 1 });
 storeSchema.index({ owner: 1 });
 storeSchema.index({ chatLinkToken: 1 });
