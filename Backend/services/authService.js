@@ -76,7 +76,7 @@ const login = async ({ email, password }) => {
   };
 };
 
-// ─── Get current user (me) ────────────────────────────────────────────────────
+
 const getMe = async (userId) => {
   const user = await User.findById(userId).populate('storeId', 'name slug chatLink logoUrl currency');
 

@@ -15,7 +15,6 @@ const sendTokenResponse = (res, statusCode, data) => {
     .json({ success: true, ...data });
 };
 
-// ─── POST /api/auth/register 
 const register = async (req, res, next) => {
   try {
     const { name, email, password, storeName } = req.body;
