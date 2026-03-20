@@ -9,17 +9,16 @@ const orderItemSchema = new mongoose.Schema(
       ref: 'Product',
       required: true,
     },
-    productName:  { type: String, required: true }, // snapshot at order time
+    productName:  { type: String, required: true },
     sku:          { type: String, default: '' },
     quantity:     { type: Number, required: true, min: 1 },
-    originalPrice:{ type: Number, required: true }, // catalogue price at order time
-    vipPrice:     { type: Number, default: null },  // owner-overridden price (null = not applied)
+    originalPrice:{ type: Number, required: true }, 
+    vipPrice:     { type: Number, default: null },  
     imageUrl:     { type: String, default: '' },
   },
   { _id: false }
 );
 
-// ─── Virtual: effectivePrice per item ────────────────────────────────────────
 orderItemSchema.virtual('effectivePrice').get(function () {
   return this.vipPrice !== null ? this.vipPrice : this.originalPrice;
 });
@@ -150,7 +149,7 @@ orderSchema.pre('save', function (next) {
 orderSchema.index({ storeId: 1 });
 orderSchema.index({ sessionId: 1 });
 orderSchema.index({ status: 1 });
-orderSchema.index({ trackingToken: 1 });
 orderSchema.index({ smartLockExpiresAt: 1 }); // TTL-sweep queries
 
 module.exports = mongoose.model('Order', orderSchema);
+

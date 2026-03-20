@@ -1,6 +1,15 @@
 const Order = require('../models/Order');
+const Product = require('../models/Product');
+const StockLedger = require('../models/StockLedger');
 
 const createOrder = async (orderData) => {
+  // Validate items and check stock if needed
+  for (const item of orderData.items) {
+    const product = await Product.findById(item.productId);
+    if (!product) throw new Error(`Product ${item.name} not found`);
+    if (product.stock < item.quantity) throw new Error(`Insufficient stock for ${product.name}`);
+  }
+
   const order = await Order.create(orderData);
   return order;
 };
@@ -25,11 +34,62 @@ const updateOrderStatus = async (orderId, status, userId, cancellationReason = '
     throw error;
   }
   
+  const oldStatus = order.status;
   order.status = status;
   order.processedBy = userId;
   
   if (status === 'cancelled') {
     order.cancellationReason = cancellationReason;
+    
+    // If it was confirmed, return stock
+    if (oldStatus === 'confirmed' || oldStatus === 'shipped') {
+        for (const item of order.items) {
+            const product = await Product.findById(item.productId);
+            if (product) {
+                const previousStock = product.stock;
+                product.stock += item.quantity;
+                await product.save();
+
+                await StockLedger.create({
+                    storeId: order.storeId,
+                    product: product._id,
+                    productName: product.name,
+                    changeType: 'order_cancelled',
+                    previousStock,
+                    changeAmount: item.quantity,
+                    newStock: product.stock,
+                    changedBy: userId,
+                    orderId: order._id,
+                    reason: `Order ${order.orderId} cancelled`
+                });
+            }
+        }
+    }
+  }
+
+  if (status === 'confirmed' && oldStatus !== 'confirmed') {
+      // Deduct stock for each item
+      for (const item of order.items) {
+          const product = await Product.findById(item.productId);
+          if (!product) continue;
+          
+          const previousStock = product.stock;
+          product.stock -= item.quantity;
+          await product.save();
+
+          await StockLedger.create({
+              storeId: order.storeId,
+              product: product._id,
+              productName: product.name,
+              changeType: 'sale',
+              previousStock,
+              changeAmount: -item.quantity,
+              newStock: product.stock,
+              changedBy: userId,
+              orderId: order._id,
+              reason: `Sale from order ${order.orderId}`
+          });
+      }
   }
   
   await order.save();

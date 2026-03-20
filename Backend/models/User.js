@@ -80,7 +80,6 @@ const userSchema = new mongoose.Schema(
 );
 
 // ─── Indexes ─────────────────────────────────────────────────────────────────
-userSchema.index({ email: 1 });
 userSchema.index({ storeId: 1 });
 
 // ─── Hash password before save ───────────────────────────────────────────────

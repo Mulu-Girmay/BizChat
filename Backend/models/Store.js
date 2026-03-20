@@ -93,8 +93,7 @@ storeSchema.pre('save', function (next) {
   next();
 });
 
-storeSchema.index({ slug: 1 });
 storeSchema.index({ owner: 1 });
-storeSchema.index({ chatLinkToken: 1 });
 
 module.exports = mongoose.model('Store', storeSchema);
+
