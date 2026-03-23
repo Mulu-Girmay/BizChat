@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './contexts/AuthContext';
+import { Provider } from 'react-redux';
+import store from './store';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { DashboardLayout } from './components/DashboardLayout';
 import { DarkModeProvider } from './components/DarkModeProvider';
@@ -25,9 +26,9 @@ const queryClient = new QueryClient({
 
 export default function App() {
   return (
-    <DarkModeProvider>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+    <Provider store={store}>
+      <DarkModeProvider>
+        <QueryClientProvider client={queryClient}>
           <BrowserRouter>
             <Routes>
               {/* Public Routes */}
@@ -83,8 +84,8 @@ export default function App() {
             </Routes>
             <Toaster position="top-right" />
           </BrowserRouter>
-        </AuthProvider>
-      </QueryClientProvider>
-    </DarkModeProvider>
+        </QueryClientProvider>
+      </DarkModeProvider>
+    </Provider>
   );
 }

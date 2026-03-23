@@ -1,6 +1,7 @@
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../store/slices/authSlice';
 import {
   LayoutDashboard,
   Package,
@@ -17,12 +18,9 @@ import { Button } from './ui/button';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { Badge } from './ui/badge';
 
-interface DashboardLayoutProps {
-  children: ReactNode;
-}
-
-export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { user, logout } = useAuth();
+export function DashboardLayout({ children }) {
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -36,7 +34,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   ];
 
   const handleLogout = () => {
-    logout();
+    dispatch(logout());
     navigate('/login');
   };
 
@@ -99,7 +97,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
               <Avatar>
                 <AvatarFallback className="bg-gradient-to-br from-violet-500 to-purple-600 text-white">
-                  {user?.name.charAt(0)}
+                  {user?.name?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">

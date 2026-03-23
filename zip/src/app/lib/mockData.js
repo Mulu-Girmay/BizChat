@@ -1,48 +1,4 @@
-export interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  price: number;
-  stock: number;
-  category: string;
-  image: string;
-  stockStatus: 'high' | 'low' | 'out';
-}
-
-export interface Order {
-  id: string;
-  customerName: string;
-  customerEmail: string;
-  items: Array<{ productId: string; productName: string; quantity: number; price: number }>;
-  total: number;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered';
-  createdAt: Date;
-  trackingToken: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  senderName: string;
-  senderType: 'customer' | 'business';
-  content: string;
-  timestamp: Date;
-  read: boolean;
-}
-
-export interface Conversation {
-  id: string;
-  customerId: string;
-  customerName: string;
-  customerEmail: string;
-  lastMessage: string;
-  lastMessageTime: Date;
-  unreadCount: number;
-  status: 'active' | 'archived';
-}
-
-export const mockProducts: Product[] = [
+export const mockProducts = [
   {
     id: 'p1',
     name: 'Wireless Headphones Pro',
@@ -105,7 +61,7 @@ export const mockProducts: Product[] = [
   }
 ];
 
-export const mockOrders: Order[] = [
+export const mockOrders = [
   {
     id: 'ord-001',
     customerName: 'Sarah Johnson',
@@ -145,7 +101,7 @@ export const mockOrders: Order[] = [
   }
 ];
 
-export const mockConversations: Conversation[] = [
+export const mockConversations = [
   {
     id: 'conv-1',
     customerId: 'cust-1',
@@ -178,7 +134,7 @@ export const mockConversations: Conversation[] = [
   }
 ];
 
-export const mockMessages: Record<string, ChatMessage[]> = {
+export const mockMessages = {
   'conv-1': [
     {
       id: 'msg-1',

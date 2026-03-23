@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../store/slices/authSlice';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -10,22 +11,20 @@ import { toast } from 'sonner';
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { loading, error } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      await login(email, password);
+    
+    const resultAction = await dispatch(login({ email, password }));
+    
+    if (login.fulfilled.match(resultAction)) {
       toast.success('Welcome back!');
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+    } else {
+      toast.error(resultAction.payload || 'Login failed. Please try again.');
     }
   };
 

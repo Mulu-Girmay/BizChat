@@ -1,9 +1,10 @@
 // Mock WebSocket service for real-time updates
-type SocketListener = (data: any) => void;
 
 class SocketService {
-  private listeners: Map<string, SocketListener[]> = new Map();
-  private connected = false;
+  constructor() {
+    this.listeners = new Map();
+    this.connected = false;
+  }
 
   connect() {
     this.connected = true;
@@ -18,14 +19,14 @@ class SocketService {
     console.log('🔌 WebSocket disconnected');
   }
 
-  on(event: string, callback: SocketListener) {
+  on(event, callback) {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, []);
     }
-    this.listeners.get(event)!.push(callback);
+    this.listeners.get(event).push(callback);
   }
 
-  off(event: string, callback: SocketListener) {
+  off(event, callback) {
     const listeners = this.listeners.get(event);
     if (listeners) {
       const index = listeners.indexOf(callback);
@@ -35,7 +36,7 @@ class SocketService {
     }
   }
 
-  emit(event: string, data: any) {
+  emit(event, data) {
     console.log(`📡 Emitting ${event}:`, data);
     const listeners = this.listeners.get(event);
     if (listeners) {
@@ -43,7 +44,7 @@ class SocketService {
     }
   }
 
-  private simulateRealTimeUpdates() {
+  simulateRealTimeUpdates() {
     // Simulate new messages every 30 seconds
     setInterval(() => {
       if (this.connected && Math.random() > 0.7) {
