@@ -17,8 +17,9 @@ export function OrdersPage() {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    if (user?.store?._id || user?.storeId) {
-      dispatch(fetchOrders(user?.store?._id || user?.storeId));
+    const storeId = user?.store?._id || user?.storeId;
+    if (storeId) {
+      dispatch(fetchOrders(storeId));
     }
   }, [dispatch, user]);
 
@@ -37,23 +38,21 @@ export function OrdersPage() {
   };
 
   const statusConfig = {
-    pending: { color: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400', icon: Clock },
-    confirmed: { color: 'border-blue-500/30 bg-blue-500/10 text-blue-400', icon: CheckCircle },
-    shipped: { color: 'border-purple-500/30 bg-purple-500/10 text-purple-400', icon: Truck },
-    delivered: { color: 'border-green-500/30 bg-green-500/10 text-green-400', icon: Package }
+    pending: { icon: Clock, color: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400' },
+    confirmed: { icon: CheckCircle, color: 'border-blue-500/30 bg-blue-500/10 text-blue-400' },
+    shipped: { icon: Truck, color: 'border-purple-500/30 bg-purple-500/10 text-purple-400' },
+    delivered: { icon: Package, color: 'border-green-500/30 bg-green-500/10 text-green-400' }
   };
 
   const statusFilters = ['all', 'pending', 'confirmed', 'shipped', 'delivered'];
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Orders</h1>
         <p className="text-gray-400">Manage and track all customer orders</p>
       </div>
 
-      {/* Status Filters */}
       <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-4 overflow-x-auto">
         <div className="flex gap-2 min-w-max">
           {statusFilters.map(status => (
@@ -77,14 +76,13 @@ export function OrdersPage() {
         </div>
       </Card>
 
-      {/* Orders List */}
       <div className="space-y-4">
         {filteredOrders.map(order => {
           const StatusIcon = statusConfig[order.status]?.icon || Package;
           return (
             <Card
               key={order._id || order.id}
-              className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6 hover:from-white/10 hover:to-white/5 transition-all cursor-pointer"
+              className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6 hover:bg-white/10 transition-all cursor-pointer group"
               onClick={() => setSelectedOrder(order)}
             >
               <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -93,7 +91,7 @@ export function OrdersPage() {
                   order.status === 'confirmed' ? 'from-blue-500 to-cyan-500' :
                   order.status === 'shipped' ? 'from-purple-500 to-pink-500' :
                   'from-green-500 to-emerald-500'
-                } flex items-center justify-center flex-shrink-0`}>
+                } flex items-center justify-center flex-shrink-0 shadow-lg shadow-black/20`}>
                   <StatusIcon className="w-6 h-6 text-white" />
                 </div>
 
@@ -105,14 +103,14 @@ export function OrdersPage() {
                     </Badge>
                   </div>
                   <p className="text-gray-400 text-sm mb-1">{order.customerName} • {order.customerEmail}</p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-gray-500 text-xs font-mono">
                     {new Date(order.createdAt).toLocaleString()}
                   </p>
                 </div>
 
-                <div className="md:text-right">
+                <div className="text-left md:text-right">
                   <p className="text-2xl font-bold text-white mb-1">${order.total?.toFixed(2)}</p>
-                  <p className="text-sm text-gray-400">{order.items?.length || 0} item{order.items?.length !== 1 ? 's' : ''}</p>
+                  <p className="text-sm text-gray-400">{order.items?.length || 0} items Total</p>
                 </div>
               </div>
             </Card>
@@ -120,27 +118,26 @@ export function OrdersPage() {
         })}
       </div>
 
-      {(loading || filteredOrders.length === 0) && !loading && (
-        <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-12 text-center">
+      {!loading && filteredOrders.length === 0 && (
+        <Card className="bg-white/5 border-dashed border-white/10 p-12 text-center">
           <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No orders found</h3>
-          <p className="text-gray-400">No orders match the selected filter</p>
+          <p className="text-gray-400">Try adjusting your filter</p>
         </Card>
       )}
 
       {loading && (
         <div className="flex justify-center py-12">
-           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500 shadow-lg shadow-violet-500/20"></div>
         </div>
       )}
 
-      {/* Order Detail Dialog */}
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
-        <DialogContent className="bg-[#13131a] border-white/10 text-white max-w-2xl shadow-2xl">
+        <DialogContent className="bg-[#13131a] border-white/10 text-white max-w-2xl shadow-2xl overflow-hidden">
           {selectedOrder && (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-3">
+                <DialogTitle className="flex items-center gap-3 text-xl">
                   <span>Order Details</span>
                   <Badge variant="outline" className={statusConfig[selectedOrder.status]?.color}>
                     {selectedOrder.status}
@@ -148,48 +145,48 @@ export function OrdersPage() {
                 </DialogTitle>
               </DialogHeader>
 
-              <div className="space-y-6">
-                {/* Customer Info */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-400 mb-2">Customer Information</h4>
-                  <div className="bg-white/5 rounded-lg p-4 border border-white/5">
+              <div className="space-y-6 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Customer</h4>
                     <p className="text-white font-medium">{selectedOrder.customerName}</p>
                     <p className="text-gray-400 text-sm">{selectedOrder.customerEmail}</p>
-                    <p className="text-gray-500 text-xs mt-2">
-                      Tracking Token: {selectedOrder.trackingToken || 'N/A'}
-                    </p>
+                  </div>
+                  <div className="bg-white/5 rounded-xl p-4 border border-white/5">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Tracking Details</h4>
+                    <p className="text-white font-mono text-sm mb-1">{selectedOrder.trackingToken}</p>
+                    <p className="text-gray-500 text-xs">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                   </div>
                 </div>
 
-                {/* Order Items */}
                 <div>
-                  <h4 className="text-sm font-semibold text-gray-400 mb-2">Items</h4>
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Order Items</h4>
                   <div className="space-y-2">
                     {selectedOrder.items?.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between bg-white/5 rounded-lg p-4 border border-white/5">
-                        <div>
-                          <p className="text-white font-medium">{item.productName}</p>
-                          <p className="text-gray-400 text-sm">Quantity: {item.quantity}</p>
+                      <div key={index} className="flex items-center justify-between bg-white/5 rounded-lg p-3 border border-white/5">
+                        <div className="flex-1 min-w-0 pr-4">
+                          <p className="text-white font-medium truncate">{item.productName}</p>
+                          <p className="text-gray-500 text-xs">Quantity: {item.quantity}</p>
                         </div>
-                        <p className="text-white font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-violet-400 font-bold">${(item.price * item.quantity).toFixed(2)}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="flex justify-between items-center mt-4 pt-4 border-t border-white/10">
-                    <span className="text-lg font-semibold text-white">Total</span>
-                    <span className="text-2xl font-bold text-white">${selectedOrder.total?.toFixed(2)}</span>
+                  <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
+                    <span className="text-lg font-semibold text-gray-400">Total Amount</span>
+                    <span className="text-3xl font-bold text-white">${selectedOrder.total?.toFixed(2)}</span>
                   </div>
                 </div>
 
-                {/* Status Actions */}
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-400 mb-2">Update Status</h4>
-                  <div className="flex gap-2">
+                <div className="pt-4">
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">Update Status</h4>
+                  <div className="flex flex-wrap gap-3">
                     {selectedOrder.status === 'pending' && (
                       <Button
                         onClick={() => handleStatusUpdateAction(selectedOrder._id || selectedOrder.id, 'confirmed')}
                         className="flex-1 bg-blue-500 hover:bg-blue-600"
                       >
+                        <CheckCircle className="w-4 h-4 mr-2" />
                         Confirm Order
                       </Button>
                     )}
@@ -198,6 +195,7 @@ export function OrdersPage() {
                         onClick={() => handleStatusUpdateAction(selectedOrder._id || selectedOrder.id, 'shipped')}
                         className="flex-1 bg-purple-500 hover:bg-purple-600"
                       >
+                        <Truck className="w-4 h-4 mr-2" />
                         Mark as Shipped
                       </Button>
                     )}
@@ -206,6 +204,7 @@ export function OrdersPage() {
                         onClick={() => handleStatusUpdateAction(selectedOrder._id || selectedOrder.id, 'delivered')}
                         className="flex-1 bg-green-500 hover:bg-green-600"
                       >
+                        <Package className="w-4 h-4 mr-2" />
                         Mark as Delivered
                       </Button>
                     )}

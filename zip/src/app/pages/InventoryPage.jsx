@@ -22,8 +22,9 @@ export function InventoryPage() {
   const [editingProduct, setEditingProduct] = useState(null);
 
   useEffect(() => {
-    if (user?.store?._id || user?.storeId) {
-      dispatch(fetchInventory(user?.store?._id || user?.storeId));
+    const storeId = user?.store?._id || user?.storeId;
+    if (storeId) {
+      dispatch(fetchInventory(storeId));
     }
   }, [dispatch, user]);
 
@@ -51,6 +52,7 @@ export function InventoryPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const stock = Number(formData.get('stock'));
+    const storeId = user?.store?._id || user?.storeId;
 
     const newProduct = {
       name: formData.get('name'),
@@ -59,7 +61,7 @@ export function InventoryPage() {
       stock,
       category: formData.get('category'),
       image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400',
-      storeId: user?.store?._id || user?.storeId
+      storeId
     };
 
     const resultAction = await dispatch(addProduct(newProduct));
@@ -79,7 +81,6 @@ export function InventoryPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">Inventory</h1>
@@ -87,7 +88,7 @@ export function InventoryPage() {
         </div>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white">
+            <Button className="bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg">
               <Plus className="w-4 h-4 mr-2" />
               Add Product
             </Button>
@@ -155,7 +156,6 @@ export function InventoryPage() {
         </Dialog>
       </div>
 
-      {/* Filters */}
       <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
@@ -185,34 +185,33 @@ export function InventoryPage() {
         </div>
       </Card>
 
-      {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts.map(product => (
-          <Card key={product._id || product.id} className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl overflow-hidden hover:from-white/10 hover:to-white/5 transition-all">
+          <Card key={product._id || product.id} className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl overflow-hidden hover:bg-white/10 transition-all group shadow-lg">
             <div className="aspect-video w-full bg-white/5 relative overflow-hidden">
               <ImageWithFallback
                 src={product.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
               />
               <Badge
                 variant="outline"
-                className={`absolute top-3 right-3 ${stockStatusColor(product.stockStatus, product.stock)}`}
+                className={`absolute top-3 right-3 shadow-md ${stockStatusColor(product.stockStatus, product.stock)}`}
               >
                 {product.stock === 0 ? 'Out of Stock' : product.stock < 10 ? 'Low Stock' : 'In Stock'}
               </Badge>
             </div>
             <div className="p-6">
               <div className="mb-4">
-                <h3 className="text-lg font-semibold text-white mb-1">{product.name}</h3>
-                <p className="text-sm text-gray-400">SKU: {product.sku}</p>
+                <h3 className="text-lg font-semibold text-white mb-1 truncate">{product.name}</h3>
+                <p className="text-xs text-gray-400 font-mono tracking-wider">{product.sku}</p>
               </div>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-2xl font-bold text-white">${product.price?.toFixed(2)}</p>
-                  <p className="text-sm text-gray-400">Stock: {product.stock} units</p>
+                  <p className="text-2xl font-bold text-white tracking-tight">${product.price?.toFixed(2)}</p>
+                  <p className="text-xs text-gray-400 mt-1">{product.stock} units available</p>
                 </div>
-                <Badge variant="outline" className="border-violet-500/30 bg-violet-500/10 text-violet-400">
+                <Badge variant="outline" className="border-violet-500/30 bg-violet-500/10 text-violet-400 px-3">
                   {product.category}
                 </Badge>
               </div>
@@ -223,7 +222,7 @@ export function InventoryPage() {
                   className="flex-1 border-white/10 text-gray-400 hover:text-white hover:bg-white/5"
                   onClick={() => setEditingProduct(product)}
                 >
-                  <Edit className="w-4 h-4 mr-1" />
+                  <Edit className="w-4 h-4 mr-1 text-violet-400" />
                   Edit
                 </Button>
                 <Button
@@ -240,8 +239,8 @@ export function InventoryPage() {
         ))}
       </div>
 
-      {(loading || filteredProducts.length === 0) && !loading && (
-        <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-12 text-center">
+      {!loading && filteredProducts.length === 0 && (
+        <Card className="bg-white/5 border-dashed border-white/10 p-12 text-center">
           <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No products found</h3>
           <p className="text-gray-400">Try adding some products or adjusting your search.</p>
@@ -250,7 +249,7 @@ export function InventoryPage() {
 
       {loading && (
         <div className="flex justify-center py-12">
-           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500 shadow-lg shadow-violet-500/20"></div>
         </div>
       )}
     </div>

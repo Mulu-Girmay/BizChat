@@ -13,16 +13,11 @@ import { OrdersPage } from './pages/OrdersPage';
 import { ChatPage } from './pages/ChatPage';
 import { StorefrontPage } from './pages/StorefrontPage';
 import { OrderTrackingPage } from './pages/OrderTrackingPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { EmployeePage } from './pages/EmployeePage';
 import { Toaster } from './components/ui/sonner';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 export default function App() {
   return (
@@ -74,6 +69,26 @@ export default function App() {
                   <ProtectedRoute>
                     <DashboardLayout>
                       <ChatPage />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                }
+              />
+               <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <SettingsPage />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/employees"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout>
+                      <EmployeePage />
                     </DashboardLayout>
                   </ProtectedRoute>
                 }

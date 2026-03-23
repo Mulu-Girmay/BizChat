@@ -54,7 +54,6 @@ export function DashboardPage() {
   const totalProducts = products.length;
   const lowStockCount = products.filter(p => p.stock < 10 || p.stockStatus === 'low' || p.stockStatus === 'out').length;
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
-  // Using unread messages from notifications for now as we don't have a chat slice yet
   const unreadMessages = notifications.length;
 
   const kpis = [
@@ -80,7 +79,7 @@ export function DashboardPage() {
       trend: '-3%'
     },
     {
-      label: 'Live Notifications',
+      label: 'Live Feed',
       value: unreadMessages,
       icon: MessageSquare,
       color: 'from-green-500 to-emerald-500',
@@ -92,25 +91,26 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Dashboard</h1>
         <p className="text-gray-400">Welcome back, {user?.name}! Here's your store's performance.</p>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {kpis.map((kpi) => (
-          <Card key={kpi.label} className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6 hover:from-white/10 hover:to-white/5 transition-all">
-            <div className="flex items-start justify-between mb-4">
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${kpi.color} flex items-center justify-center shadow-lg`}>
+          <Card key={kpi.label} className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6 hover:bg-white/10 transition-all group overflow-hidden relative">
+             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                <kpi.icon className="w-16 h-16" />
+             </div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${kpi.color} flex items-center justify-center shadow-lg shadow-black/20`}>
                 <kpi.icon className="w-6 h-6 text-white" />
               </div>
               <Badge variant="outline" className="border-green-500/30 bg-green-500/10 text-green-400 text-xs">
                 {kpi.trend}
               </Badge>
             </div>
-            <div>
+            <div className="relative z-10">
               <p className="text-gray-400 text-sm mb-1">{kpi.label}</p>
               <p className="text-3xl font-bold text-white tracking-tight">{kpi.value}</p>
             </div>
@@ -119,7 +119,6 @@ export function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Orders */}
         <Card className="lg:col-span-2 bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-white">Recent Orders</h2>
@@ -170,7 +169,6 @@ export function DashboardPage() {
           </div>
         </Card>
 
-        {/* Real-time Notifications */}
         <Card className="bg-gradient-to-br from-white/5 to-white/[0.02] border-white/10 backdrop-blur-xl p-6 h-full">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold text-white">Live Feed</h2>
@@ -203,9 +201,8 @@ export function DashboardPage() {
         </Card>
       </div>
 
-      {/* Low Stock Alert */}
       {lowStockCount > 0 && (
-        <Card className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border-orange-500/20 backdrop-blur-xl p-6">
+        <Card className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border-orange-500/20 backdrop-blur-xl p-6 shadow-xl shadow-orange-500/5">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center shadow-inner">
               <AlertCircle className="w-6 h-6 text-orange-400" />
@@ -215,7 +212,7 @@ export function DashboardPage() {
               <p className="text-gray-300">{lowStockCount} product{lowStockCount !== 1 ? 's' : ''} need restocking</p>
             </div>
             <Link to="/inventory">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium">
+              <Button className="bg-orange-500 hover:bg-orange-600 text-white font-medium shadow-lg shadow-orange-500/20">
                 View Inventory
               </Button>
             </Link>

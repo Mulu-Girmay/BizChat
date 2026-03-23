@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { register, clearError } from '../store/slices/authSlice';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -12,22 +13,27 @@ export function RegisterPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [businessName, setBusinessName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.auth);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(clearError());
 
-    try {
-      await register(email, password, name, businessName);
+    const resultAction = await dispatch(register({ 
+      email, 
+      password, 
+      name, 
+      storeName: businessName 
+    }));
+
+    if (register.fulfilled.match(resultAction)) {
       toast.success('Account created successfully!');
       navigate('/dashboard');
-    } catch (error) {
-      toast.error('Registration failed. Please try again.');
-    } finally {
-      setLoading(false);
+    } else {
+      toast.error(resultAction.payload || 'Registration failed. Please try again.');
     }
   };
 
@@ -103,7 +109,7 @@ export function RegisterPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white"
+              className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white transition-all transform active:scale-95"
             >
               {loading ? 'Creating account...' : 'Create account'}
             </Button>
