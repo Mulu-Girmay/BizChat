@@ -1,0 +1,192 @@
+🚀 FULL FRONTEND IMPLEMENTATION PROMPT (PRO LEVEL)
+🧠 Project Overview
+
+Project Name: BizChat Inventory
+Type: Real-Time Business Dashboard + Conversational Commerce Platform
+
+Build a high-performance, scalable, real-time web application that allows small businesses to manage inventory, communicate with customers, and process orders directly inside a chat interface.
+
+The frontend must integrate with a backend running at:
+
+http://localhost:5001
+🎨 Design System (MANDATORY)
+Theme: “Sentinel Command Center”
+Dark-first UI (primary)
+Colors:
+Background: #0B0F14
+Surface: #111827
+Accent: Electric Blue #3B82F6 OR Cyber Green #22C55E
+Typography:
+Font: Inter / Outfit
+Headings: bold, tight spacing
+UI Effects:
+Glassmorphism panels
+Soft shadows
+Smooth transitions (150–300ms)
+⚙️ TECH STACK
+Framework: React (Vite) or Next.js
+Styling: TailwindCSS
+State Management: React Query (server state) + Zustand or Redux Toolkit
+Real-time: socket.io-client
+Routing: React Router / Next Router
+Forms: React Hook Form
+HTTP: Axios
+🔐 AUTHENTICATION & AUTHORIZATION
+Features:
+Login / Register
+JWT-based authentication
+Role-based UI rendering
+Roles:
+Owner
+Full access
+Manage employees
+System settings
+Employee
+Limited access (chat + orders only)
+Requirements:
+Protected routes
+Token persistence (localStorage or cookies)
+Auto logout on token expiry
+Refresh token logic (optional advanced)
+🧭 APPLICATION STRUCTURE
+Pages:
+/login
+/register
+/dashboard
+  /inventory
+  /orders
+  /chat
+  /analytics
+/shop/:slug
+/track/:trackingToken
+🧩 CORE FEATURES
+📊 1. DASHBOARD (Main Hub)
+UI:
+KPI cards:
+Total Products
+Low Stock Items
+Pending Orders
+Real-time indicators:
+New orders
+Incoming messages
+Features:
+Live updates via WebSocket
+Toast notifications for events
+📦 2. INVENTORY MANAGEMENT
+Features:
+Add / Edit / Delete products
+Stock indicators:
+High (green)
+Low (yellow)
+Out of stock (red)
+Advanced:
+Search + filter
+Pagination or infinite scroll
+📜 3. STOCK LEDGER (VERY IMPORTANT ⭐)
+Features:
+Scrollable transaction log
+Each entry shows:
+Action (Sale / Restock / Adjustment)
+Quantity change
+Timestamp
+Performance:
+Virtualized list (for large data)
+🛒 4. ORDER MANAGEMENT
+Features:
+Live order feed
+Status badges:
+Pending
+Confirmed
+Shipped
+Cancelled
+Actions:
+Confirm order → deduct stock
+Cancel order → restore stock
+UX:
+Highlight new orders in real-time
+💬 5. REAL-TIME CHAT CENTER (CORE FEATURE)
+Layout:
+Left: Conversations list
+Center: Chat messages
+Right: Product context panel
+Chat Features:
+Send/receive messages via WebSocket
+Typing indicator
+Message timestamps
+Delivery status (sent/delivered)
+Contextual Product Cards:
+Show product info when referenced
+Allow:
+Add product to order
+Send product in chat
+UX Enhancements:
+Auto scroll to latest message
+Unread badges
+Group messages by time/user
+🌐 6. PUBLIC STOREFRONT
+Route:
+/shop/:slug
+Features:
+Product catalog grid
+Add to cart (Ghost Cart)
+Checkout Flow:
+Open modal
+Trigger backend “Smart Lock” (reserve stock)
+Submit order
+UX:
+Clean, minimal, fast
+Mobile responsive
+🔗 7. ANONYMOUS ORDER TRACKING
+Route:
+/track/:trackingToken
+Features:
+Show:
+Order status
+Order items
+Total price
+UX:
+No login required
+Simple progress indicator
+⚡ REAL-TIME SYSTEM REQUIREMENTS
+
+Use WebSockets for:
+
+New messages
+New orders
+Stock updates
+Behavior:
+UI updates instantly without refresh
+Fallback to polling if disconnected
+🧠 PERFORMANCE REQUIREMENTS
+Lazy load pages (code splitting)
+Virtualize large lists (chat, ledger)
+Debounce search inputs
+Cache API responses (React Query)
+Optimistic UI updates
+❗ ERROR & EDGE CASE HANDLING
+
+Must include:
+
+UI States:
+Loading (skeletons)
+Empty states
+Error states
+Examples:
+API failure → show retry button
+Socket disconnect → show “Reconnecting…”
+🔔 NOTIFICATION SYSTEM
+Toast notifications:
+New order
+New message
+Optional sound alerts
+📱 RESPONSIVENESS
+Fully responsive
+Works on:
+Desktop (primary)
+Tablet
+Mobile (important for storefront)
+🔒 SECURITY (Frontend Awareness)
+Hide restricted UI by role
+Validate inputs
+Sanitize data
+Secure token storage
