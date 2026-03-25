@@ -124,25 +124,23 @@ const orderSchema = new mongoose.Schema(
 );
 
 // ─── Generate orderNumber + trackingToken before first save ──────────────────
-orderSchema.pre('save', function (next) {
+orderSchema.pre('save', function () {
   if (this.isNew) {
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const rand = Math.floor(1000 + Math.random() * 9000);
     this.orderNumber   = `ORD-${date}-${rand}`;
     this.trackingToken = uuidv4();
   }
-  next();
 });
 
 // ─── Recalculate totalAmount before save ─────────────────────────────────────
-orderSchema.pre('save', function (next) {
+orderSchema.pre('save', function () {
   if (this.isModified('items')) {
     this.totalAmount = this.items.reduce((sum, item) => {
       const price = item.vipPrice !== null ? item.vipPrice : item.originalPrice;
       return sum + price * item.quantity;
     }, 0);
   }
-  next();
 });
 
 // ─── Indexes ─────────────────────────────────────────────────────────────────
@@ -152,4 +150,3 @@ orderSchema.index({ status: 1 });
 orderSchema.index({ smartLockExpiresAt: 1 }); // TTL-sweep queries
 
 module.exports = mongoose.model('Order', orderSchema);
-

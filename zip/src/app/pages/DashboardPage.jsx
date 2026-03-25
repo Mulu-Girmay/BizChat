@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventory } from '../store/slices/inventorySlice';
 import { fetchOrders } from '../store/slices/orderSlice';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
@@ -55,6 +55,8 @@ export function DashboardPage() {
   const lowStockCount = products.filter(p => p.stock < 10 || p.stockStatus === 'low' || p.stockStatus === 'out').length;
   const pendingOrders = orders.filter(o => o.status === 'pending').length;
   const unreadMessages = notifications.length;
+  const getOrderTotal = (order) => order.totalAmount ?? order.total ?? 0;
+  const getCustomerName = (order) => order.customer?.name || order.customerName || 'Guest Customer';
 
   const kpis = [
     {
@@ -140,13 +142,13 @@ export function DashboardPage() {
                   className="flex items-center justify-between p-4 bg-white/5 border border-white/5 rounded-xl hover:bg-white/10 transition-all group"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate">{order.customerName}</p>
+                    <p className="text-white font-medium truncate">{getCustomerName(order)}</p>
                     <p className="text-sm text-gray-400 truncate">
                       {order.items?.[0]?.productName} {order.items?.length > 1 && `+${order.items.length - 1} more`}
                     </p>
                   </div>
                   <div className="text-right mr-4 shrink-0">
-                    <p className="text-white font-semibold">${order.total?.toFixed(2)}</p>
+                    <p className="text-white font-semibold">${getOrderTotal(order).toFixed(2)}</p>
                     <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleTimeString()}</p>
                   </div>
                   <Badge
@@ -156,9 +158,9 @@ export function DashboardPage() {
                         ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400'
                         : order.status === 'confirmed'
                         ? 'border-blue-500/30 bg-blue-500/10 text-blue-400'
-                        : order.status === 'shipped'
-                        ? 'border-purple-500/30 bg-purple-500/10 text-purple-400'
-                        : 'border-green-500/30 bg-green-500/10 text-green-400'
+                        : order.status === 'fulfilled'
+                        ? 'border-green-500/30 bg-green-500/10 text-green-400'
+                        : 'border-red-500/30 bg-red-500/10 text-red-400'
                     }
                   >
                     {order.status}

@@ -81,7 +81,7 @@ storeSchema.virtual('chatLink').get(function () {
 });
 
 // ─── Auto-generate slug from name if not provided ────────────────────────────
-storeSchema.pre('save', function (next) {
+storeSchema.pre('save', function () {
   if (this.isNew && !this.slug) {
     this.slug = this.name
       .toLowerCase()
@@ -90,10 +90,8 @@ storeSchema.pre('save', function (next) {
       .replace(/\s+/g, '-')
       .substring(0, 50);
   }
-  next();
 });
 
 storeSchema.index({ owner: 1 });
 
 module.exports = mongoose.model('Store', storeSchema);
-

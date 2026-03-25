@@ -3,6 +3,7 @@ const express = require('express');
 const { Server } = require('socket.io');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
@@ -24,8 +25,12 @@ connectDb();
 connectRedis();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
+app.use(cookieParser());
 
 // Routes
 const authRouter = require('./routes/authRoutes');

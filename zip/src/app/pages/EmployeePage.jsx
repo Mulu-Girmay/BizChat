@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -12,7 +11,6 @@ import { toast } from 'sonner';
 import api from '../lib/api';
 
 export function EmployeePage() {
-  const { user } = useSelector((state) => state.auth);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -24,7 +22,7 @@ export function EmployeePage() {
   const fetchEmployees = async () => {
     try {
       const response = await api.get('/users');
-      setEmployees(response.data);
+      setEmployees(response.data.data || []);
     } catch (err) {
       toast.error('Failed to fetch employees');
     } finally {
@@ -35,12 +33,12 @@ export function EmployeePage() {
   const handleInviteEmployee = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const name = formData.get('name');
     const email = formData.get('email');
-    const role = formData.get('role');
 
     setLoading(true);
     try {
-      await api.post('/auth/invite-employee', { email, role });
+      await api.post('/auth/invite-employee', { name, email, permissions: {} });
       toast.success(`Invitation sent to ${email}`);
       setIsInviteOpen(false);
       fetchEmployees();
@@ -82,6 +80,17 @@ export function EmployeePage() {
             </DialogHeader>
             <form onSubmit={handleInviteEmployee} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  placeholder="Jane Doe"
+                  required
+                  className="bg-white/5 border-white/10 text-white"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
@@ -91,17 +100,6 @@ export function EmployeePage() {
                   required
                   className="bg-white/5 border-white/10 text-white"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role">Role</Label>
-                <select
-                  id="role"
-                  name="role"
-                  className="w-full bg-white/5 border-white/10 rounded-xl px-4 py-2 text-white outline-none focus:ring-1 focus:ring-violet-500"
-                >
-                  <option value="employee" className="bg-[#13131a]">Employee</option>
-                  <option value="owner" className="bg-[#13131a]">Admin</option>
-                </select>
               </div>
               <Button type="submit" className="w-full bg-violet-500 hover:bg-violet-600 shadow-lg shadow-violet-500/10">
                 Send Invitation
@@ -138,14 +136,16 @@ export function EmployeePage() {
                   <Edit className="w-4 h-4 mr-2" />
                   Permissions
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-red-500/30 text-red-500 hover:bg-red-500/10"
-                  onClick={() => handleRemoveEmployee(member._id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                {member.role !== 'owner' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-500/30 text-red-500 hover:bg-red-500/10"
+                    onClick={() => handleRemoveEmployee(member._id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </div>
           </Card>

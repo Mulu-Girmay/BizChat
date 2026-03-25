@@ -12,7 +12,7 @@ export const login = createAsyncThunk(
       localStorage.setItem('bizchat_user', JSON.stringify(user));
       return { user, token };
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Login failed');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Login failed');
     }
   }
 );
@@ -27,7 +27,7 @@ export const register = createAsyncThunk(
       localStorage.setItem('bizchat_user', JSON.stringify(user));
       return { user, token };
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Registration failed');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Registration failed');
     }
   }
 );
@@ -37,9 +37,9 @@ export const getMe = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/auth/me');
-      return response.data.user;
+      return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to fetch user');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch user');
     }
   }
 );

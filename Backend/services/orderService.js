@@ -5,9 +5,21 @@ const StockLedger = require('../models/StockLedger');
 const createOrder = async (orderData) => {
   // Validate items and check stock if needed
   for (const item of orderData.items) {
-    const product = await Product.findById(item.productId);
-    if (!product) throw new Error(`Product ${item.name} not found`);
+    const productId = item.product || item.productId;
+    const product = await Product.findById(productId);
+    if (!product) {
+      throw new Error(`Product ${item.productName || item.name || productId} not found`);
+    }
     if (product.stock < item.quantity) throw new Error(`Insufficient stock for ${product.name}`);
+
+    // Normalize incoming payload so it matches the Order schema.
+    item.product = product._id;
+    if (item.originalPrice === undefined) {
+      item.originalPrice = item.price ?? product.price;
+    }
+    if (!item.productName) item.productName = product.name;
+    if (item.sku === undefined) item.sku = product.sku || '';
+    if (item.imageUrl === undefined) item.imageUrl = product.images?.[0] || '';
   }
 
   const order = await Order.create(orderData);
@@ -60,7 +72,7 @@ const updateOrderStatus = async (orderId, status, userId, cancellationReason = '
                     newStock: product.stock,
                     changedBy: userId,
                     orderId: order._id,
-                    reason: `Order ${order.orderId} cancelled`
+                    reason: `Order ${order.orderNumber} cancelled`
                 });
             }
         }
@@ -87,7 +99,7 @@ const updateOrderStatus = async (orderId, status, userId, cancellationReason = '
               newStock: product.stock,
               changedBy: userId,
               orderId: order._id,
-              reason: `Sale from order ${order.orderId}`
+              reason: `Sale from order ${order.orderNumber}`
           });
       }
   }

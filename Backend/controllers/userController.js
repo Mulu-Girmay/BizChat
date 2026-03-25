@@ -21,8 +21,22 @@ exports.updateUserProfile = async (req, res, next) => {
 
 exports.getUsers = async (req, res, next) => {
   try {
-    const users = await userService.getAllUsers(req.query);
+    const users = await userService.getStoreUsers(req.user.storeId);
     res.status(200).json({ success: true, count: users.length, data: users });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    await userService.deactivateEmployee({
+      requesterId: req.user.id,
+      requesterStoreId: req.user.storeId,
+      targetUserId: req.params.id,
+    });
+
+    res.status(200).json({ success: true, message: 'Employee removed successfully' });
   } catch (error) {
     next(error);
   }

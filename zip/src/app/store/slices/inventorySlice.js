@@ -9,7 +9,7 @@ export const fetchInventory = createAsyncThunk(
       // The backend seems to return { success: true, data: [...] } or just the array depending on the controller
       return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to fetch inventory');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch inventory');
     }
   }
 );
@@ -21,7 +21,7 @@ export const addProduct = createAsyncThunk(
       const response = await api.post('/inventory', productData);
       return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to add product');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to add product');
     }
   }
 );
@@ -33,7 +33,7 @@ export const updateProduct = createAsyncThunk(
       const response = await api.put(`/inventory/${id}`, data);
       return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to update product');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update product');
     }
   }
 );
@@ -45,7 +45,7 @@ export const deleteProduct = createAsyncThunk(
       await api.delete(`/inventory/${id}`);
       return id;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to delete product');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to delete product');
     }
   }
 );

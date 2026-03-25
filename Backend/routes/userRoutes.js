@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUserProfile, updateUserProfile, getUsers } = require('../controllers/userController');
+const { getUserProfile, updateUserProfile, getUsers, deleteUser } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
@@ -10,8 +10,9 @@ router.use(protect);
 router.get('/profile', getUserProfile);
 router.put('/profile', updateUserProfile);
 
-// Admin / Owner level routes
-router.use(authorize('owner', 'admin'));
+// Owner level routes
+router.use(authorize('owner'));
 router.get('/', getUsers);
+router.delete('/:id', deleteUser);
 
 module.exports = router;

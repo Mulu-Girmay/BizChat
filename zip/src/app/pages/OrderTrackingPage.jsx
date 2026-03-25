@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { CheckCircle, Clock, Truck, Package, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle, Clock, Package, Loader2, AlertCircle } from 'lucide-react';
 import api from '../lib/api';
 
 export function OrderTrackingPage() {
@@ -47,15 +47,25 @@ export function OrderTrackingPage() {
   }
 
   const isCompleted = (status) => {
-    const statuses = ['pending', 'confirmed', 'shipped', 'delivered'];
+    if (order.status === 'cancelled') {
+      return ['pending', 'confirmed', 'cancelled'].includes(status);
+    }
+    const statuses = ['pending', 'confirmed', 'fulfilled'];
     return statuses.indexOf(order.status) >= statuses.indexOf(status);
   };
+
+  const getCustomerName = () => order.customer?.name || order.customerName || 'Guest Customer';
+  const getCustomerContact = () => order.customer?.phone || order.customerEmail || 'No contact';
+  const getOrderTotal = () => order.totalAmount ?? order.total ?? 0;
+  const getItemUnitPrice = (item) => item.vipPrice ?? item.originalPrice ?? item.price ?? 0;
 
   const statusSteps = [
     { status: 'pending', label: 'Order Placed', icon: Clock, completed: isCompleted('pending') },
     { status: 'confirmed', label: 'Confirmed', icon: CheckCircle, completed: isCompleted('confirmed') },
-    { status: 'shipped', label: 'Shipped', icon: Truck, completed: isCompleted('shipped') },
-    { status: 'delivered', label: 'Delivered', icon: Package, completed: isCompleted('delivered') }
+    { status: 'fulfilled', label: 'Fulfilled', icon: Package, completed: isCompleted('fulfilled') },
+    ...(order.status === 'cancelled'
+      ? [{ status: 'cancelled', label: 'Cancelled', icon: AlertCircle, completed: true }]
+      : [])
   ];
 
   return (
@@ -77,9 +87,9 @@ export function OrderTrackingPage() {
                   ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400'
                   : order.status === 'confirmed'
                   ? 'border-blue-500/30 bg-blue-500/10 text-blue-400'
-                  : order.status === 'shipped'
-                  ? 'border-purple-500/30 bg-purple-500/10 text-purple-400'
-                  : 'border-green-500/30 bg-green-500/10 text-green-400'
+                  : order.status === 'fulfilled'
+                  ? 'border-green-500/30 bg-green-500/10 text-green-400'
+                  : 'border-red-500/30 bg-red-500/10 text-red-400'
               }`}
             >
               {order.status}
@@ -133,11 +143,11 @@ export function OrderTrackingPage() {
             <div className="space-y-6">
               <div>
                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Full Name</p>
-                <p className="text-white font-medium">{order.customerName}</p>
+                <p className="text-white font-medium">{getCustomerName()}</p>
               </div>
               <div>
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Email Terminal</p>
-                <p className="text-white font-medium">{order.customerEmail}</p>
+                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Contact</p>
+                <p className="text-white font-medium">{getCustomerContact()}</p>
               </div>
               <div>
                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">Tracking Token</p>
@@ -158,9 +168,9 @@ export function OrderTrackingPage() {
                 <div key={index} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-colors">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-white truncate">{item.productName}</p>
-                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-tighter">Units: {item.quantity} × ${item.price.toFixed(2)}</p>
+                    <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-tighter">Units: {item.quantity} × ${getItemUnitPrice(item).toFixed(2)}</p>
                   </div>
-                  <p className="text-violet-400 font-bold ml-4">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="text-violet-400 font-bold ml-4">${(getItemUnitPrice(item) * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </div>
@@ -168,7 +178,7 @@ export function OrderTrackingPage() {
                <div className="flex justify-between items-center bg-violet-500/10 p-4 rounded-2xl border border-violet-500/20">
                   <span className="text-gray-400 text-xs font-bold uppercase tracking-widest">Total Valuation</span>
                   <span className="text-2xl font-bold text-white shadow-sm ring-1 ring-violet-500/20 px-4 py-1.5 rounded-xl">
-                    ${order.total?.toFixed(2)}
+                    ${getOrderTotal().toFixed(2)}
                   </span>
                </div>
             </div>

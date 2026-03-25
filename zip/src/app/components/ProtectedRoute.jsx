@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router';
+import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 export function ProtectedRoute({ children, requiredRole }) {

@@ -8,6 +8,30 @@ const signToken = (userId) =>
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 
+const toBaseSlug = (name) =>
+  (name || 'store')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .substring(0, 50) || 'store';
+
+const ensureUniqueStoreSlug = async (storeName) => {
+  const base = toBaseSlug(storeName);
+  let slug = base;
+  let counter = 1;
+
+  while (await Store.exists({ slug })) {
+    const suffix = `-${counter}`;
+    slug = `${base.substring(0, Math.max(1, 50 - suffix.length))}${suffix}`;
+    counter += 1;
+  }
+
+  return slug;
+};
+
 const register = async ({ name, email, password, storeName }) => {
   const existing = await User.findOne({ email });
   if (existing) {
@@ -18,8 +42,12 @@ const register = async ({ name, email, password, storeName }) => {
 
   const user = await User.create({ name, email, password, role: 'owner' });
 
+  const finalStoreName = storeName || `${name}'s Store`;
+  const uniqueSlug = await ensureUniqueStoreSlug(finalStoreName);
+
   const store = await Store.create({
-    name: storeName || `${name}'s Store`,
+    name: finalStoreName,
+    slug: uniqueSlug,
     owner: user._id,
     alertEmails: [email],
   });

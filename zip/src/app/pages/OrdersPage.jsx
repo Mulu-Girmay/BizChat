@@ -37,14 +37,19 @@ export function OrdersPage() {
     }
   };
 
+  const getCustomerName = (order) => order.customer?.name || order.customerName || 'Guest Customer';
+  const getCustomerContact = (order) => order.customer?.phone || order.customerEmail || 'No contact';
+  const getOrderTotal = (order) => order.totalAmount ?? order.total ?? 0;
+  const getItemUnitPrice = (item) => item.vipPrice ?? item.originalPrice ?? item.price ?? 0;
+
   const statusConfig = {
     pending: { icon: Clock, color: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400' },
     confirmed: { icon: CheckCircle, color: 'border-blue-500/30 bg-blue-500/10 text-blue-400' },
-    shipped: { icon: Truck, color: 'border-purple-500/30 bg-purple-500/10 text-purple-400' },
-    delivered: { icon: Package, color: 'border-green-500/30 bg-green-500/10 text-green-400' }
+    fulfilled: { icon: Package, color: 'border-green-500/30 bg-green-500/10 text-green-400' },
+    cancelled: { icon: Truck, color: 'border-red-500/30 bg-red-500/10 text-red-400' }
   };
 
-  const statusFilters = ['all', 'pending', 'confirmed', 'shipped', 'delivered'];
+  const statusFilters = ['all', 'pending', 'confirmed', 'fulfilled', 'cancelled'];
 
   return (
     <div className="space-y-6">
@@ -89,8 +94,8 @@ export function OrdersPage() {
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${
                   order.status === 'pending' ? 'from-yellow-500 to-orange-500' :
                   order.status === 'confirmed' ? 'from-blue-500 to-cyan-500' :
-                  order.status === 'shipped' ? 'from-purple-500 to-pink-500' :
-                  'from-green-500 to-emerald-500'
+                  order.status === 'fulfilled' ? 'from-green-500 to-emerald-500' :
+                  'from-red-500 to-rose-500'
                 } flex items-center justify-center flex-shrink-0 shadow-lg shadow-black/20`}>
                   <StatusIcon className="w-6 h-6 text-white" />
                 </div>
@@ -102,14 +107,14 @@ export function OrdersPage() {
                       {order.status}
                     </Badge>
                   </div>
-                  <p className="text-gray-400 text-sm mb-1">{order.customerName} • {order.customerEmail}</p>
+                  <p className="text-gray-400 text-sm mb-1">{getCustomerName(order)} • {getCustomerContact(order)}</p>
                   <p className="text-gray-500 text-xs font-mono">
                     {new Date(order.createdAt).toLocaleString()}
                   </p>
                 </div>
 
                 <div className="text-left md:text-right">
-                  <p className="text-2xl font-bold text-white mb-1">${order.total?.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-white mb-1">${getOrderTotal(order).toFixed(2)}</p>
                   <p className="text-sm text-gray-400">{order.items?.length || 0} items Total</p>
                 </div>
               </div>
@@ -149,8 +154,8 @@ export function OrdersPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-white/5 rounded-xl p-4 border border-white/5">
                     <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Customer</h4>
-                    <p className="text-white font-medium">{selectedOrder.customerName}</p>
-                    <p className="text-gray-400 text-sm">{selectedOrder.customerEmail}</p>
+                    <p className="text-white font-medium">{getCustomerName(selectedOrder)}</p>
+                    <p className="text-gray-400 text-sm">{getCustomerContact(selectedOrder)}</p>
                   </div>
                   <div className="bg-white/5 rounded-xl p-4 border border-white/5">
                     <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Tracking Details</h4>
@@ -168,13 +173,13 @@ export function OrdersPage() {
                           <p className="text-white font-medium truncate">{item.productName}</p>
                           <p className="text-gray-500 text-xs">Quantity: {item.quantity}</p>
                         </div>
-                        <p className="text-violet-400 font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-violet-400 font-bold">${(getItemUnitPrice(item) * item.quantity).toFixed(2)}</p>
                       </div>
                     ))}
                   </div>
                   <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
                     <span className="text-lg font-semibold text-gray-400">Total Amount</span>
-                    <span className="text-3xl font-bold text-white">${selectedOrder.total?.toFixed(2)}</span>
+                    <span className="text-3xl font-bold text-white">${getOrderTotal(selectedOrder).toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -192,20 +197,11 @@ export function OrdersPage() {
                     )}
                     {selectedOrder.status === 'confirmed' && (
                       <Button
-                        onClick={() => handleStatusUpdateAction(selectedOrder._id || selectedOrder.id, 'shipped')}
-                        className="flex-1 bg-purple-500 hover:bg-purple-600"
-                      >
-                        <Truck className="w-4 h-4 mr-2" />
-                        Mark as Shipped
-                      </Button>
-                    )}
-                    {selectedOrder.status === 'shipped' && (
-                      <Button
-                        onClick={() => handleStatusUpdateAction(selectedOrder._id || selectedOrder.id, 'delivered')}
+                        onClick={() => handleStatusUpdateAction(selectedOrder._id || selectedOrder.id, 'fulfilled')}
                         className="flex-1 bg-green-500 hover:bg-green-600"
                       >
                         <Package className="w-4 h-4 mr-2" />
-                        Mark as Delivered
+                        Mark as Fulfilled
                       </Button>
                     )}
                   </div>

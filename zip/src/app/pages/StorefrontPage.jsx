@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -19,6 +19,16 @@ export function StorefrontPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showCart, setShowCart] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const getSessionId = () => {
+    const key = 'bizchat_session_id';
+    const existing = localStorage.getItem(key);
+    if (existing) return existing;
+
+    const generated = `sess-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(key, generated);
+    return generated;
+  };
 
   useEffect(() => {
     const fetchStoreData = async () => {
@@ -88,15 +98,21 @@ export function StorefrontPage() {
     try {
       const orderData = {
         storeId: store._id,
+        sessionId: getSessionId(),
+        customer: {
+          name: 'Guest Customer',
+          phone: '',
+          notes: '',
+        },
         items: cart.map(item => ({
-          productId: item.product._id,
+          product: item.product._id,
+          productName: item.product.name,
+          sku: item.product.sku || '',
           quantity: item.quantity,
-          price: item.product.price,
-          productName: item.product.name
+          originalPrice: item.product.price,
+          imageUrl: item.product.image || item.product.images?.[0] || ''
         })),
-        total: cartTotal,
-        customerName: 'Guest Customer',
-        customerEmail: 'guest@example.com'
+        totalAmount: cartTotal
       };
 
       const response = await api.post('/orders', orderData);

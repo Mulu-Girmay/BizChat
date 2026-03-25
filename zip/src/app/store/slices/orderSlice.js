@@ -8,7 +8,7 @@ export const fetchOrders = createAsyncThunk(
       const response = await api.get(`/orders/store/${storeId}`);
       return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to fetch orders');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch orders');
     }
   }
 );
@@ -20,7 +20,7 @@ export const updateOrderStatus = createAsyncThunk(
       const response = await api.put(`/orders/${orderId}/status`, { status });
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.response.data.message || 'Failed to update order status');
+      return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update order status');
     }
   }
 );
